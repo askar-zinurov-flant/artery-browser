@@ -7,6 +7,8 @@ require "json"
 module Artery
   module Browser
     class App
+      INDEX_HTML = File.open("#{__dir__}/../../../public/index.html", File::RDONLY).read
+
       def self.for(host: nil, path: nil, api_url: nil, environment: nil)
         ::Rack::Builder.new do
           use Rack::Static,
@@ -32,6 +34,11 @@ module Artery
 
       def call(env)
         router = Router.new(routing)
+        %w[/].each do |starting_route|
+          router.add_route("GET", starting_route) do |_, urls|
+            [200, { "content-type" => "text/html;charset=utf-8" }, [INDEX_HTML]]
+          end
+        end
         router.handle(::Rack::Request.new(env))
       rescue Router::NoMatch
         not_found
