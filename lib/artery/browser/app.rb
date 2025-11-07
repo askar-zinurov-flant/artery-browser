@@ -16,8 +16,9 @@ module Artery
               %w[
                   index.html
                   logo.svg
-                  assets/index-CA3lEEVU.js
-                  assets/index-1s3WlefU.css
+                  assets/index-ChzQfaGj.js
+                  assets/index-DH2iXAi_.css
+                  assets/validate-routes-Cx95rB3S.js
                 ].map { |f| ["/#{f}", f] }.to_h,
             root: "#{__dir__}/../../../public"
           run App.new(
@@ -40,24 +41,21 @@ module Artery
           end
         end
 
-        router.add_route("GET", '/subscriptions') do |_, urls|
-          subscriptions = Artery.subscriptions.map do |route, listeners|
-            listeners.map do |listener|
-              {
-                path: route.to_s,
-                route: {
-                  service: route.service,
-                  model: route.model,
-                  action: route.action,
-                  plural: route.plural
-                },
-                listener: listener.info.attributes.merge('synchronize' => listener.synchronize?)
-              }
-            end
-          end
-
-          json(subscriptions.flatten)
+        router.add_route("GET", '/subscriptions') do |_, _urls|
+          json(Artery.subscriptions.map do |route, listeners|
+            {
+              path: route.to_s,
+              service: route.service,
+              model: route.model,
+              action: route.action,
+              plural: route.plural,
+              listeners: listeners.map do |listener|
+                listener.info.attributes.merge(synchronize: listener.synchronize?)
+              end
+            }
+          end)
         end
+
         router.handle(::Rack::Request.new(env))
       rescue Router::NoMatch
         not_found
