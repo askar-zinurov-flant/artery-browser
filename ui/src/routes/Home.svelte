@@ -1,8 +1,10 @@
 <script>
     import { route } from '../router';
-    import {Alert} from "flowbite-svelte";
+    import {Card} from "flowbite-svelte";
 </script>
 
-<Alert color="primary">
-    Welcome to Artery!
-</Alert>
+<div class="flex flex-row min-h-screen justify-center items-center">
+    <Card size="md" class="p-5 horizontal">
+        <div>Welcome to Artery!</div>
+    </Card>
+</div>

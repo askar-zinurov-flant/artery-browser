@@ -1,15 +1,32 @@
-<script>
-    import {Listgroup, ListgroupItem, Label, Input, Button, InputAddon, ButtonGroup, Toggle} from "flowbite-svelte";
+<script lang="ts">
+    import {Input, Button, InputAddon, ButtonGroup, Toggle, Spinner} from "flowbite-svelte";
     import {ArrowDownOutline, ArrowUpOutline} from "flowbite-svelte-icons";
 
     let {listener, edit = false} = $props();
-    let editing = $state(edit);
+    let latest_index = $state(listener.latest_index);
+    let editing: boolean = $state(edit);
+    let saving: boolean = $state(false);
 
     const propClass = "";
+
+    const save = async () => {
+        saving = true;
+        const result = await fetch(`${import.meta.env.VITE_API_URL}/listeners/${listener.id}`, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ latest_index })
+        });
+        saving = false;
+        if (result.ok) {
+            window.location.reload();
+        } else {
+            console.error(await result.text());
+        }
+    }
 </script>
 
 <div>
-    <article class="p-4 m-2 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <article class="p-4 m-2 border rounded-lg shadow bg-default">
         <heading class="flex justify-between">
             <h5 class="mb-4 text-xl font-medium">
                 {#if listener.synchronize }
@@ -36,7 +53,7 @@
                 </ButtonGroup>
                 <ButtonGroup class={propClass}>
                     <InputAddon class="w-52">Latest Index</InputAddon>
-                    <Input type="number" bind:value={listener.latest_index} readonly={!editing}></Input>
+                    <Input type="number" bind:value={latest_index} readonly={!editing}></Input>
                 </ButtonGroup>
                 <ButtonGroup class={propClass}>
                     <InputAddon class="w-52">Service</InputAddon>
@@ -64,7 +81,14 @@
             </div>
         </div>
         <div class="m-5 flex justify-end">
-            <Button disabled={!editing}>Save</Button>
+            <Button disabled={!editing || saving} onclick={() => { save(); }}>
+                {#if saving}
+                    <Spinner size="4" class="me-4"/>
+                    Saving ...
+                {:else}
+                    Save
+                {/if}
+            </Button>
         </div>
     </article>
 </div>

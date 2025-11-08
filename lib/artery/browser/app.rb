@@ -9,39 +9,34 @@ module Artery
     class App
       INDEX_HTML = File.open("#{__dir__}/../../../public/index.html", File::RDONLY).read
 
-      def self.for(host: nil, path: nil, api_url: nil, environment: nil)
+      def self.build
         ::Rack::Builder.new do
           use Rack::Static,
             urls:
               %w[
                   index.html
                   logo.svg
-                  assets/index-ChzQfaGj.js
-                  assets/index-DH2iXAi_.css
+                  assets/index-Ntg3TtDJ.js
+                  assets/index-Dw-hdo5G.css
                   assets/validate-routes-Cx95rB3S.js
                 ].map { |f| ["/#{f}", f] }.to_h,
             root: "#{__dir__}/../../../public"
-          run App.new(
-            host: host,
-            root_path: path,
-            api_url: api_url,
-          )
+          run App.new
         end
       end
 
-      def initialize(host:, root_path:, api_url:)
-        @routing = Urls.from_configuration(host, root_path, api_url)
+      def initialize
       end
 
       def call(env)
-        router = Router.new(routing)
+        router = Router.new
         %w[/].each do |starting_route|
-          router.add_route("GET", starting_route) do |_, _urls|
+          router.add_route("GET", starting_route) do |_params, _request|
             [200, { "content-type" => "text/html;charset=utf-8" }, [INDEX_HTML]]
           end
         end
 
-        router.add_route("GET", '/subscriptions') do |_, _urls|
+        router.add_route("GET", '/subscriptions') do |_params, _request|
           json(Artery.subscriptions.map do |route, listeners|
             {
               path: route.to_s,
@@ -56,14 +51,25 @@ module Artery
           end)
         end
 
+        router.add_route("PUT", '/listeners/:listener_id') do |params, request|
+          listener = Artery.subscription_info_class.find(params.fetch('listener_id'))
+          updates = JSON.parse(request.body.gets).slice('latest_index')
+          listener.update!(updates)
+          Artery.subscriptions.each do |_route, listeners|
+            listeners.each do |subscription_listener|
+              subscription_listener.info.reload if subscription_listener.info == listener
+            end
+          end
+
+          json(listener.attributes)
+        end
+
         router.handle(::Rack::Request.new(env))
       rescue Router::NoMatch
         not_found
       end
 
       private
-
-      attr_reader :routing
 
       def not_found
         [404, {}, []]

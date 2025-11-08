@@ -22,8 +22,8 @@ module Artery
           match_data.named_captures.transform_values { |v| Rack::Utils.unescape(v) } if match_data
         end
 
-        def call(params, urls)
-          handler[params, urls]
+        def call(params, request)
+          handler[params, request]
         end
 
         private
@@ -35,9 +35,8 @@ module Artery
         attr_reader :request_method, :pattern, :handler
       end
 
-      def initialize(urls = Urls.initial)
+      def initialize()
         @routes = Array.new
-        @urls = urls
       end
 
       def add_route(request_method, pattern, &block)
@@ -47,14 +46,14 @@ module Artery
       def handle(request)
         routes.each do |route|
           route_params = route.match(request)
-          return(route.call(request.params.merge(route_params), urls.with_request(request))) if route_params
+          return(route.call(request.params.merge(route_params), request)) if route_params
         end
         raise NoMatch
       end
 
       private
 
-      attr_reader :routes, :urls
+      attr_reader :routes
     end
   end
 end
