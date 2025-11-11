@@ -13,13 +13,10 @@ module Artery
         ::Rack::Builder.new do
           use Rack::Static,
               urls:
-                %w[
-                  index.html
-                  logo.svg
-                  assets/index-CFTHRyuc.js
-                  assets/index-Dw-hdo5G.css
-                  assets/validate-routes-Cx95rB3S.js
-                ].map { |f| ["/#{f}", f] }.to_h,
+                %w[index.html logo.svg
+                   assets/index-CFTHRyuc.js
+                   assets/index-Dw-hdo5G.css
+                   assets/validate-routes-Cx95rB3S.js].map { |f| ["/#{f}", f] }.to_h,
               root: "#{__dir__}/../../../public"
           run App.new
         end
@@ -27,6 +24,7 @@ module Artery
 
       def initialize; end
 
+      # rubocop:disable Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/CyclomaticComplexity
       def call(env)
         router = Router.new
         %w[/].each do |starting_route|
@@ -54,22 +52,26 @@ module Artery
         end
 
         router.add_route('PUT', '/listeners/:listener_id') do |params, request|
-          listener = Artery.subscription_info_class.find(params.fetch('listener_id'))
+          listener_info = Artery.subscription_info_class.find(params.fetch('listener_id'))
           updates = JSON.parse(request.body.gets).slice('latest_index')
-          listener.update!(updates)
+
           Artery.subscriptions.each_value do |listeners|
             listeners.each do |subscription_listener|
-              subscription_listener.info.reload if subscription_listener.info == listener
+              subscription_listener_info = subscription_listener.info
+              next unless subscription_listener_info == listener_info
+
+              subscription_listener_info.with_lock { subscription_listener_info.update!(updates) }
             end
           end
 
-          json(listener.attributes)
+          json(listener_info.attributes.slice('id'))
         end
 
         router.handle(::Rack::Request.new(env))
       rescue Router::NoMatch
         not_found
       end
+      # rubocop:enable Metrics/PerceivedComplexity, Metrics/AbcSize, Metrics/CyclomaticComplexity
 
       private
 

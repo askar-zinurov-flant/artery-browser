@@ -6,7 +6,7 @@ module Artery
       NoMatch = Class.new(StandardError)
 
       class Route
-        NAMED_SEGMENTS_PATTERN = %r{/([^/]*):([^:$/]+)}
+        NAMED_SEGMENTS_PATTERN = %r{/([^/]*):([^:$/]+)}.freeze
         private_constant :NAMED_SEGMENTS_PATTERN
 
         def initialize(request_method, pattern, &block)

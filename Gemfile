@@ -9,3 +9,4 @@ gemspec
 
 gem 'rack', '~> 3.2'
 gem 'rack-test'
+gem 'rubocop', '~> 1.81'
