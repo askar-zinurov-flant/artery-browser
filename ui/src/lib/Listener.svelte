@@ -79,7 +79,7 @@
                 </ButtonGroup>
                 <ButtonGroup class={propClass}>
                     <InputAddon class="w-52">Latest Outgoing Index</InputAddon>
-                    <Input type="number" value={listener.latest_outgoing_index} readonly></Input>
+                    <Input type="number" value={listener.latest_outgoing_message_index } readonly></Input>
                 </ButtonGroup>
             </div>
             <div class="w-1/2">
