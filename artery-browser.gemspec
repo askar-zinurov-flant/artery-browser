@@ -10,9 +10,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Askar Zinurov']
   spec.email         = ['askar.zinurov@flant.com']
 
-  spec.summary       = 'Admin Browser for artery configuration'
-  spec.description   = 'Admin Browser for artery configuration.'
-  spec.homepage      = 'https://github.com/askar-zinurov-flant/artery-browser'
+  spec.summary       = 'Admin Browser for artery'
+  spec.description   = 'Admin Browser for artery.'
+  spec.homepage      = 'https://github.com/flant/artery-browser'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
     spec.metadata['allowed_push_host'] = 'https://rubygems.org/'
 
     spec.metadata['homepage_uri'] = spec.homepage
-    spec.metadata['source_code_uri'] = 'https://github.com/askar-zinurov-flant/artery-browser'
+    spec.metadata['source_code_uri'] = 'https://github.com/flant/artery-browser'
     # spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
   else
     raise 'RubyGems 2.0 or newer is required to protect against ' \
