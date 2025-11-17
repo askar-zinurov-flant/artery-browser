@@ -14,7 +14,7 @@ module Artery
           use Rack::Static,
               urls:
                 %w[index.html logo.svg
-                   assets/index-BbIFdT-n.js
+                   assets/index-CYa_NEh9.js
                    assets/index-Dw-hdo5G.css
                    assets/validate-routes-Cx95rB3S.js].map { |f| ["/#{f}", f] }.to_h,
               root: "#{__dir__}/../../../public"

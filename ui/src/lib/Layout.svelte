@@ -31,7 +31,7 @@
         <Spinner/>
     {:then}
         <SplitPane minSize={300} initialSizes={[30, 70]} class="h-screen">
-            <Pane class="min-w-200">
+            <Pane class="min-w-200 overflow-auto">
                 <SidebarGroup>
                     {#each appState.subscriptions as subscription}
                         <SidebarItem class={["flex items-center p-2 rounded-lg hover:bg-primary-100 hover:text-primary-900", isActive(`/${subscription.path}`) && activeClass]}
