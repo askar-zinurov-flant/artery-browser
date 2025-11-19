@@ -28,8 +28,12 @@ module Artery
       def call(env)
         router = Router.new
         %w[/].each do |starting_route|
-          router.add_route('GET', starting_route) do |_params, _request|
-            [200, { 'content-type' => 'text/html;charset=utf-8' }, [INDEX_HTML]]
+          router.add_route('GET', starting_route) do |_params, request|
+            if request.env['REQUEST_URI'].end_with?('/')
+              [200, { 'content-type' => 'text/html;charset=utf-8' }, [INDEX_HTML]]
+            else
+              [302, { 'Location' => "#{request.env['REQUEST_URI']}/" }, []]
+            end
           end
         end
 
